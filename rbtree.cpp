@@ -371,17 +371,12 @@ void RBTree::print(bool show_null_leaves) const {
         return;
     }
 
-    int height = this->height();
-    if (show_null_leaves == true) {
-        height++;
-    }
-
     // Maximum number of digit of node in tree
     int d = std::max(digit_count(this->max()->inf), digit_count(this->min()->inf));
     int width, offset = 1;
 
     vector<vector<Node *>> array;
-    array.assign(height, {});
+    array.assign((show_null_leaves == true) ? (this->height() + 1) : (this->height()), {});
     for (vector<Node *> &level : array) {
         level.assign(offset, nullptr);
         offset <<= 1;
