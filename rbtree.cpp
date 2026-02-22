@@ -326,13 +326,13 @@ void RBTree::make_array(
 
     if (node->left != nullptr) {
         this->make_array(array, node->left, show_null_leaves, depth + 1, count * 2);
-    } else if (show_null_leaves == true) {
+    } else if (show_null_leaves) {
         array[depth + 1][count * 2 - (1 << (depth + 1))] = RBTree::NIL;
     }
 
     if (node->right != nullptr) {
         this->make_array(array, node->right, show_null_leaves, depth + 1, count * 2 + 1);
-    } else if (show_null_leaves == true) {
+    } else if (show_null_leaves) {
         array[depth + 1][count * 2 + 1 - (1 << (depth + 1))] = RBTree::NIL;
     }
 }
@@ -376,7 +376,7 @@ void RBTree::print(bool show_null_leaves) const {
     int width, offset = 1;
 
     vector<vector<Node *>> array;
-    array.assign((show_null_leaves == true) ? (this->height() + 1) : (this->height()), {});
+    array.assign(show_null_leaves ? (this->height() + 1) : this->height(), {});
     for (vector<Node *> &level : array) {
         level.assign(offset, nullptr);
         offset <<= 1;
