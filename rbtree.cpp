@@ -154,37 +154,46 @@ void RBTree::erase(int value) {
 
 // Erases the node `node` from tree and calls the fixup function
 void RBTree::erase_node(Node *node) {
-    if (node->left != nullptr || node->right != nullptr) { // If `node` has children ...
-        Node *temp;
-        if (node->left == nullptr) {
-            temp = node->right;
-        } else if (node->right == nullptr) {
-            temp = node->left;
-        } else {
-            temp = this->min(node->right);
-        }
-        node->inf = temp->inf;
-        node = temp; // ... redefine `node` as his childless descendant
+    Node *del, *del_child;
+    // Choosing node to delete
+    if (node->left == nullptr || node->right == nullptr) {
+        del = node;
+    } else {
+        del = min(node->right);
+        node->inf = del->inf;
     }
 
-    if (node->parent == nullptr) { // Root
-        this->root = nullptr;
+    if (del->left != nullptr) {
+        del_child = del->left;
     } else {
-        if (node->color == 'b') {
-            this->erase_fixup(node);
-        }
-        if (node->parent->left == node) {
-            node->parent->left = nullptr;
-        } else {
-            node->parent->right = nullptr;
-        }
+        del_child = del->right;
     }
-    delete node;
+
+    if (del->color == 'b') {
+        erase_fixup(del);
+    }
+
+    if (del_child != nullptr) {
+        del_child->parent = del->parent;
+    }
+
+    // Replacing `del` with `del_child`
+    if (del->parent == nullptr) {
+        this->root = del_child;
+        if (this->root != nullptr) {
+            this->root->color = 'b';
+        }
+    } else if (del == del->parent->left) {
+        del->parent->left = del_child;
+    } else {
+        del->parent->right = del_child;
+    }
+    delete del;
 }
 
 // Auxullary function for `erase`, it does a fixup of a tree
 void RBTree::erase_fixup(Node *node) {
-    while (node->parent != nullptr && node->color == 'b') {
+    while (node != this->root && node->color == 'b') {
         if (node == node->parent->left) {
             Node *s = node->parent->right;
             if (s != nullptr && s->color == 'r') { // Sibling is red
@@ -237,7 +246,6 @@ void RBTree::erase_fixup(Node *node) {
                     s->color = 'r';
                     this->left_rotate(s);
                     s = node->parent->left;
-                    node->parent = node->parent;
                 }
                 // Sibling is black, his left child is red
                 s->color = node->parent->color;
@@ -317,8 +325,7 @@ int RBTree::height() const {
     return this->height(this->root);
 }
 
-// Traversal with depth calculation and node offset from the left edge of the
-// level
+// Traversal with depth calculation and node offset from the left edge of the level
 void RBTree::make_array(
     vector<vector<Node *>> &array, Node *node, bool show_null_leaves, int depth, int count
 ) const {
@@ -371,10 +378,7 @@ void RBTree::print(bool show_null_leaves) const {
         return;
     }
 
-    // Maximum number of digit of node in tree
-    int d = std::max(digit_count(this->max()->inf), digit_count(this->min()->inf));
     int width, offset = 1;
-
     vector<vector<Node *>> array;
     array.assign(show_null_leaves ? (this->height() + 1) : this->height(), {});
     for (vector<Node *> &level : array) {
@@ -383,15 +387,18 @@ void RBTree::print(bool show_null_leaves) const {
     }
     this->make_array(array, this->root, show_null_leaves);
 
-    // TODO: don't use offset in loop
+    // Maximum number of digit of node in tree
+    int d = std::max(digit_count(this->max()->inf), digit_count(this->min()->inf));
+    width = (d + 1) * (offset >> 1);
+    offset = 1;
     for (vector<Node *> &level : array) {
-        offset >>= 1;
-        width = (d + 1) * offset / 2;
-        for (auto node : level) {
-            RBTree::print_node(node, width);
-            width = (d + 1) * offset;
+        RBTree::print_node(level[0], width >> 1);
+        for (int i = 1; i < offset; ++i) {
+            RBTree::print_node(level[i], width);
         }
         cout << '\n';
+        offset <<= 1;
+        width >>= 1;
     }
 }
 

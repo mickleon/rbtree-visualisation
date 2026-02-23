@@ -32,7 +32,7 @@ private:
     void left_rotate(Node *p);
     void insert_fixup(Node *node);
     void erase_node(Node *node);
-    void erase_fixup(Node *p);
+    void erase_fixup(Node *node);
     Node *find(Node *node, int value) const;
     Node *max(Node *node) const;
     Node *min(Node *node) const;
