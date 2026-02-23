@@ -317,8 +317,7 @@ int RBTree::height() const {
     return this->height(this->root);
 }
 
-// Traversal with depth calculation and node offset from the left edge of the
-// level
+// Traversal with depth calculation and node offset from the left edge of the level
 void RBTree::make_array(
     vector<vector<Node *>> &array, Node *node, bool show_null_leaves, int depth, int count
 ) const {
@@ -371,10 +370,7 @@ void RBTree::print(bool show_null_leaves) const {
         return;
     }
 
-    // Maximum number of digit of node in tree
-    int d = std::max(digit_count(this->max()->inf), digit_count(this->min()->inf));
     int width, offset = 1;
-
     vector<vector<Node *>> array;
     array.assign(show_null_leaves ? (this->height() + 1) : this->height(), {});
     for (vector<Node *> &level : array) {
@@ -383,15 +379,18 @@ void RBTree::print(bool show_null_leaves) const {
     }
     this->make_array(array, this->root, show_null_leaves);
 
-    // TODO: don't use offset in loop
+    // Maximum number of digit of node in tree
+    int d = std::max(digit_count(this->max()->inf), digit_count(this->min()->inf));
+    width = (d + 1) * (offset >> 1);
+    offset = 1;
     for (vector<Node *> &level : array) {
-        offset >>= 1;
-        width = (d + 1) * offset / 2;
-        for (auto node : level) {
-            RBTree::print_node(node, width);
-            width = (d + 1) * offset;
+        RBTree::print_node(level[0], width >> 1);
+        for (int i = 1; i < offset; ++i) {
+            RBTree::print_node(level[i], width);
         }
         cout << '\n';
+        offset <<= 1;
+        width >>= 1;
     }
 }
 
