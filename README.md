@@ -23,7 +23,7 @@ The following functions are available for working with tree:
 - `Node* RBTree::find(int value)`: returns a pointer to a node in the tree with the value `value`.
 - `Node* RBTree::max()`: returns a pointer to a node in the tree with the maximal value.
 - `Node* RBTree::min()`: returns a pointer to a node in the tree with the minimal value.
-- `void RBTree::print(bool show_null_leaves = false)`: outputs the tree to the console. It has optional parameter `show_null_leaves` that is false by default, responsible for displaying null leaves.
+- `ostream &operator<<(ostream &out, const RBTree &tr)`: outputs the tree to the ostream. If `RBTree::show_null_leaves` is `true` (`false` by default) it displays null leaves.
 - `void RBTree::clear()`: erases all the nodes from the tree.
 
 ## Example of output
@@ -33,4 +33,3 @@ The following functions are available for working with tree:
 With null leaves:
 
 ![Tree output with null leaves](/img/tree_output_null_leaves.png)
-

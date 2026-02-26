@@ -5,11 +5,11 @@
 
 #include "rbtree.h"
 
-using std::vector, std::cout, std::setw;
+using std::vector, std::cout, std::setw, std::ostream;
 
 Node::Node(int value): inf(value), left(nullptr), right(nullptr), parent(nullptr), color('r') {}
 
-RBTree::RBTree(): root(nullptr) {}
+RBTree::RBTree(): root(nullptr), show_null_leaves(false) {}
 
 // "nullptr" node that used for `print(show_null_leaves = true)`
 Node *RBTree::NIL = new Node(0);
@@ -326,20 +326,18 @@ int RBTree::height() const {
 }
 
 // Traversal with depth calculation and node offset from the left edge of the level
-void RBTree::make_array(
-    vector<vector<Node *>> &array, Node *node, bool show_null_leaves, int depth, int count
-) const {
+void RBTree::make_array(vector<vector<Node *>> &array, Node *node, int depth, int count) const {
     array[depth][count - (1 << depth)] = node;
 
     if (node->left != nullptr) {
-        this->make_array(array, node->left, show_null_leaves, depth + 1, count * 2);
-    } else if (show_null_leaves) {
+        this->make_array(array, node->left, depth + 1, count * 2);
+    } else if (this->show_null_leaves) {
         array[depth + 1][count * 2 - (1 << (depth + 1))] = RBTree::NIL;
     }
 
     if (node->right != nullptr) {
-        this->make_array(array, node->right, show_null_leaves, depth + 1, count * 2 + 1);
-    } else if (show_null_leaves) {
+        this->make_array(array, node->right, depth + 1, count * 2 + 1);
+    } else if (this->show_null_leaves) {
         array[depth + 1][count * 2 + 1 - (1 << (depth + 1))] = RBTree::NIL;
     }
 }
@@ -355,51 +353,52 @@ int digit_count(int x) {
     }
 }
 
-// Auxulary function for the `print`, it outputs one node `node` with width `width` and color. If
-// `node == RBTree::NIL`, it outputs `n`
-void RBTree::print_node(Node *node, int width = 0) {
+ostream &operator<<(ostream &out, const Node *node) {
+    int width = cout.width();
+    out << setw(0);
     if (node == nullptr) {
         if (width > 0) {
-            cout << setw(width) << ' ';
+            out << setw(width) << ' ';
         }
     } else if (node == RBTree::NIL) {
-        cout << setw(width) << 'n';
+        out << setw(width) << 'n';
     } else if (node->color == 'r') {
-        cout << "\033[31m" << setw(width) << node->inf << "\033[0m";
+        out << "\033[31m" << setw(width) << node->inf << "\033[0m";
     } else {
-        cout << setw(width) << node->inf;
+        out << setw(width) << node->inf;
     }
+    return out;
 }
 
-// Function for tree output
-void RBTree::print(bool show_null_leaves) const {
-    if (this->root == nullptr) {
-        cout << "NULL TREE\n";
-        return;
+ostream &operator<<(ostream &out, const RBTree &tr) {
+    if (tr.root == nullptr) {
+        out << "NULL TREE\n";
+        return out;
     }
 
     int width, offset = 1;
     vector<vector<Node *>> array;
-    array.assign(show_null_leaves ? (this->height() + 1) : this->height(), {});
+    array.assign(tr.show_null_leaves ? (tr.height() + 1) : tr.height(), {});
     for (vector<Node *> &level : array) {
         level.assign(offset, nullptr);
         offset <<= 1;
     }
-    this->make_array(array, this->root, show_null_leaves);
+    tr.make_array(array, tr.root);
 
     // Maximum number of digits in node
-    int d = std::max(digit_count(this->max()->inf), digit_count(this->min()->inf));
+    int d = std::max(digit_count(tr.max()->inf), digit_count(tr.min()->inf));
     width = (d + 1) * (offset >> 1);
     offset = 1;
     for (vector<Node *> &level : array) {
-        RBTree::print_node(level[0], width >> 1);
+        out << setw(width >> 1) << level[0];
         for (int i = 1; i < offset; ++i) {
-            RBTree::print_node(level[i], width);
+            out << setw(width) << level[i];
         }
-        cout << '\n';
+        out << '\n';
         offset <<= 1;
         width >>= 1;
     }
+    return out;
 }
 
 // Erases all the nodes from the subtree `node`

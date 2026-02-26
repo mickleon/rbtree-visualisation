@@ -1,6 +1,9 @@
 #ifndef TREE_H
 #define TREE_H
+#include <ostream>
 #include <vector>
+
+using std::ostream;
 
 struct Node {
     int inf;
@@ -13,6 +16,7 @@ struct Node {
 
 class RBTree {
 public:
+    bool show_null_leaves;
     RBTree();
 
     ~RBTree();
@@ -22,8 +26,9 @@ public:
     Node *find(int value) const;
     Node *max() const;
     Node *min() const;
-    void print(bool show_null_leaves = false) const;
     void clear();
+
+    friend ostream &operator<<(ostream &ostream, const RBTree &tr);
 
 private:
     Node *root;
@@ -40,9 +45,10 @@ private:
     int height(Node *node) const;
     int height() const;
     void make_array(
-        std::vector<std::vector<Node *>> &array, Node *node, bool show_null_leaves = false,
-        int depth = 0, int count = 1
+        std::vector<std::vector<Node *>> &array, Node *node, int depth = 0, int count = 1
     ) const;
-    static void print_node(Node *node, int width);
+    static void print_node(Node *node);
+
+    friend ostream &operator<<(ostream &ostream, const Node *node);
 };
 #endif
