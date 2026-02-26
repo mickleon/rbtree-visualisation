@@ -374,7 +374,7 @@ void RBTree::print_node(Node *node, int width = 0) {
 // Function for tree output
 void RBTree::print(bool show_null_leaves) const {
     if (this->root == nullptr) {
-        std::cout << "NULL TREE\n";
+        cout << "NULL TREE\n";
         return;
     }
 
