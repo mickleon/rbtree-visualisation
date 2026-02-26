@@ -3,7 +3,7 @@
 #include <ostream>
 #include <vector>
 
-using std::ostream;
+using std::ostream, std::vector;
 
 struct Node {
     int inf;
@@ -11,7 +11,7 @@ struct Node {
     Node *parent;
     char color;
 
-    Node(int value);
+    Node(const int value);
 };
 
 class RBTree {
@@ -21,33 +21,34 @@ public:
 
     ~RBTree();
 
-    void insert(int value);
-    void erase(int value);
-    Node *find(int value) const;
-    Node *max() const;
-    Node *min() const;
+    void insert(const int value);
+    void erase(const int value);
+    Node *find(const int value) const;
+    int max() const;
+    int min() const;
     void clear();
 
     friend ostream &operator<<(ostream &ostream, const RBTree &tr);
 
 private:
     Node *root;
-    static Node *NIL;
+    static const Node *NIL;
+
     void right_rotate(Node *p);
     void left_rotate(Node *p);
     void insert_fixup(Node *node);
     void erase_node(Node *node);
     void erase_fixup(Node *node);
-    Node *find(Node *node, int value) const;
+    Node *find(Node *node, const int value) const;
     Node *max(Node *node) const;
     Node *min(Node *node) const;
     void clear(Node *node);
-    int height(Node *node) const;
+    int height(const Node *node) const;
     int height() const;
     void make_array(
-        std::vector<std::vector<Node *>> &array, Node *node, int depth = 0, int count = 1
+        vector<vector<const Node *>> &array, const Node *node, const int depth = 0,
+        const int count = 1
     ) const;
-    static void print_node(Node *node);
 
     friend ostream &operator<<(ostream &ostream, const Node *node);
 };

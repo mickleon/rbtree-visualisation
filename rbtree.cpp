@@ -1,18 +1,24 @@
 #include <cmath>
 #include <iomanip>
 #include <iostream>
-#include <vector>
 
 #include "rbtree.h"
 
 using std::vector, std::cout, std::setw, std::ostream;
 
-Node::Node(int value): inf(value), left(nullptr), right(nullptr), parent(nullptr), color('r') {}
+Node::Node(const int value) {
+    inf = value;
+    left = right = parent = nullptr;
+    color = 'r';
+}
 
-RBTree::RBTree(): root(nullptr), show_null_leaves(false) {}
+RBTree::RBTree() {
+    root = nullptr;
+    show_null_leaves = false;
+}
 
 // "nullptr" node that used for `print(show_null_leaves = true)`
-Node *RBTree::NIL = new Node(0);
+const Node *RBTree::NIL = new Node(0);
 
 RBTree::~RBTree() {
     clear(this->root);
@@ -69,7 +75,7 @@ void RBTree::right_rotate(Node *p) {
 }
 
 // Inserts node with value `value` to a tree and calls the fixup function
-void RBTree::insert(int value) {
+void RBTree::insert(const int value) {
     Node *temp = this->root;
     while (temp != nullptr) {
         if (value < temp->inf && temp->left != nullptr) {
@@ -145,7 +151,7 @@ void RBTree::insert_fixup(Node *node) {
 }
 
 // Erases the node with value `value` from tree and calls the fixup function
-void RBTree::erase(int value) {
+void RBTree::erase(const int value) {
     Node *node = this->find(value);
     if (node != nullptr) {
         this->erase_node(node);
@@ -262,7 +268,7 @@ void RBTree::erase_fixup(Node *node) {
 }
 
 // Returns a pointer to a node in the subtree `node` with the value `value`
-Node *RBTree::find(Node *node, int value) const {
+Node *RBTree::find(Node *node, const int value) const {
     if (node == nullptr || node->inf == value) {
         return node;
     }
@@ -274,7 +280,7 @@ Node *RBTree::find(Node *node, int value) const {
 }
 
 // Overload of previous function, where `node` is a tree root `this->root`
-Node *RBTree::find(int value) const {
+Node *RBTree::find(const int value) const {
     return this->find(this->root, value);
 }
 
@@ -292,8 +298,8 @@ Node *RBTree::max(Node *node) const {
 }
 
 // Overload of previous function, where `node` is a tree root `this->root`
-Node *RBTree::max() const {
-    return this->max(this->root);
+int RBTree::max() const {
+    return this->max(this->root)->inf;
 }
 
 // Returns a pointer to a node in the subtree `node` with the minimal value
@@ -309,11 +315,11 @@ Node *RBTree::min(Node *node) const {
 }
 
 // Overload of previous function, where `node` is a tree root `this->root`
-Node *RBTree::min() const {
-    return this->min(this->root);
+int RBTree::min() const {
+    return this->min(this->root)->inf;
 }
 
-int RBTree::height(Node *node) const {
+int RBTree::height(const Node *node) const {
     if (node == nullptr) {
         return 0;
     }
@@ -326,7 +332,9 @@ int RBTree::height() const {
 }
 
 // Traversal with depth calculation and node offset from the left edge of the level
-void RBTree::make_array(vector<vector<Node *>> &array, Node *node, int depth, int count) const {
+void RBTree::make_array(
+    vector<vector<const Node *>> &array, const Node *node, const int depth, const int count
+) const {
     array[depth][count - (1 << depth)] = node;
 
     if (node->left != nullptr) {
@@ -343,7 +351,7 @@ void RBTree::make_array(vector<vector<Node *>> &array, Node *node, int depth, in
 }
 
 // The number of characters to output the number
-int digit_count(int x) {
+const int digit_count(const int x) {
     if (x > 0) {
         return log10(x) + 1;
     } else if (x < 0) {
@@ -354,7 +362,7 @@ int digit_count(int x) {
 }
 
 ostream &operator<<(ostream &out, const Node *node) {
-    int width = cout.width();
+    const std::streamsize width = cout.width();
     out << setw(0);
     if (node == nullptr) {
         if (width > 0) {
@@ -377,19 +385,19 @@ ostream &operator<<(ostream &out, const RBTree &tr) {
     }
 
     int width, offset = 1;
-    vector<vector<Node *>> array;
+    vector<vector<const Node *>> array;
     array.assign(tr.show_null_leaves ? (tr.height() + 1) : tr.height(), {});
-    for (vector<Node *> &level : array) {
+    for (vector<const Node *> &level : array) {
         level.assign(offset, nullptr);
         offset <<= 1;
     }
     tr.make_array(array, tr.root);
 
     // Maximum number of digits in node
-    int d = std::max(digit_count(tr.max()->inf), digit_count(tr.min()->inf));
+    const int d = std::max(digit_count(tr.max(tr.root)->inf), digit_count(tr.min(tr.root)->inf));
     width = (d + 1) * (offset >> 1);
     offset = 1;
-    for (vector<Node *> &level : array) {
+    for (vector<const Node *> &level : array) {
         out << setw(width >> 1) << level[0];
         for (int i = 1; i < offset; ++i) {
             out << setw(width) << level[i];
