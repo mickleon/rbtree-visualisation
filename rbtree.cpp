@@ -387,7 +387,7 @@ void RBTree::print(bool show_null_leaves) const {
     }
     this->make_array(array, this->root, show_null_leaves);
 
-    // Maximum number of digit of node in tree
+    // Maximum number of digits in node
     int d = std::max(digit_count(this->max()->inf), digit_count(this->min()->inf));
     width = (d + 1) * (offset >> 1);
     offset = 1;
