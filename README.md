@@ -11,7 +11,15 @@ This is a training example of a red/black tree. This may be necessary for those 
 ## Run
 
 ```bash
-g++ main.cpp rbtree.cpp -o main && ./main
+make
+./main
+```
+
+or
+
+```bash
+g++ main.cpp rbtree.cpp -o main
+./main
 ```
 
 ## Available features
