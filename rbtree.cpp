@@ -347,7 +347,7 @@ void RBTree::make_array(
 }
 
 // The number of characters to output the number
-const int digit_count(const int x) {
+int digit_count(const int x) {
     if (x > 0) {
         return log10(x) + 1;
     } else if (x < 0) {
