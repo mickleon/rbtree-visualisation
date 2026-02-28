@@ -13,10 +13,12 @@ public:
     ~RBTree();
 
     struct Node {
+        enum Color { BLACK, RED };
+
         int inf;
         Node *left, *right;
         Node *parent;
-        char color;
+        Color color;
 
         Node(const int value);
     };

@@ -9,7 +9,7 @@ using std::vector, std::cout, std::setw, std::ostream;
 RBTree::Node::Node(const int value) {
     inf = value;
     left = right = parent = nullptr;
-    color = 'r';
+    color = RED;
 }
 
 RBTree::RBTree() {
@@ -105,14 +105,14 @@ void RBTree::insert(const int value) {
 
 // Auxullary function for `insert`, it does a fixup of a tree
 void RBTree::insert_fixup(Node *node) {
-    while (node->parent != nullptr && node->parent->color == 'r') {
+    while (node->parent != nullptr && node->parent->color == Node::RED) {
         Node *g = node->parent->parent;
         if (node->parent == g->left) {
             Node *u = g->right;
-            if (u != nullptr && u->color == 'r') { // Uncle is red
-                node->parent->color = 'b';
-                u->color = 'b';
-                g->color = 'r';
+            if (u != nullptr && u->color == Node::RED) { // Uncle is red
+                node->parent->color = Node::BLACK;
+                u->color = Node::BLACK;
+                g->color = Node::RED;
                 node = g;
             } else {                               // Uncle is black
                 if (node == node->parent->right) { // Node is left child
@@ -121,17 +121,17 @@ void RBTree::insert_fixup(Node *node) {
                     g = node->parent->parent;
                 }
                 // Node is right child
-                node->parent->color = 'b';
-                g->color = 'r';
+                node->parent->color = Node::BLACK;
+                g->color = Node::RED;
                 this->right_rotate(g);
                 break;
             }
         } else { // Symmetricall case
             Node *u = g->left;
-            if (u != nullptr && u->color == 'r') { // Uncle is red
-                node->parent->color = 'b';
-                u->color = 'b';
-                g->color = 'r';
+            if (u != nullptr && u->color == Node::RED) { // Uncle is red
+                node->parent->color = Node::BLACK;
+                u->color = Node::BLACK;
+                g->color = Node::RED;
                 node = g;
             } else {                              // Uncle is black
                 if (node == node->parent->left) { // Node is left child
@@ -140,14 +140,14 @@ void RBTree::insert_fixup(Node *node) {
                     g = node->parent->parent;
                 }
                 // Node is right child
-                node->parent->color = 'b';
-                g->color = 'r';
+                node->parent->color = Node::BLACK;
+                g->color = Node::RED;
                 this->left_rotate(g);
                 break;
             }
         }
     }
-    this->root->color = 'b';
+    this->root->color = Node::BLACK;
 }
 
 // Erases the node with value `value` from tree and calls the fixup function
@@ -175,7 +175,7 @@ void RBTree::erase_node(Node *node) {
         del_child = del->right;
     }
 
-    if (del->color == 'b') {
+    if (del->color == Node::BLACK) {
         erase_fixup(del);
     }
 
@@ -187,7 +187,7 @@ void RBTree::erase_node(Node *node) {
     if (del->parent == nullptr) {
         this->root = del_child;
         if (this->root != nullptr) {
-            this->root->color = 'b';
+            this->root->color = Node::BLACK;
         }
     } else if (del == del->parent->left) {
         del->parent->left = del_child;
@@ -199,72 +199,72 @@ void RBTree::erase_node(Node *node) {
 
 // Auxullary function for `erase`, it does a fixup of a tree
 void RBTree::erase_fixup(Node *node) {
-    while (node != this->root && node->color == 'b') {
+    while (node != this->root && node->color == Node::BLACK) {
         if (node == node->parent->left) {
             Node *s = node->parent->right;
-            if (s != nullptr && s->color == 'r') { // Sibling is red
-                s->color = 'b';
-                node->parent->color = 'r';
+            if (s != nullptr && s->color == Node::RED) { // Sibling is red
+                s->color = Node::BLACK;
+                node->parent->color = Node::RED;
                 this->left_rotate(node->parent);
                 s = node->parent->right;
             }
-            if ((s->left == nullptr || s->left->color == 'b') &&
+            if ((s->left == nullptr || s->left->color == Node::BLACK) &&
                 (s->right == nullptr ||
-                 s->right->color == 'b')) { // Sibling and his children is black
-                s->color = 'r';
+                 s->right->color == Node::BLACK)) { // Sibling and his children is black
+                s->color = Node::RED;
                 node = node->parent;
             } else { // Sibling is black, his left child is red, right is black
-                if ((s->right == nullptr || s->right->color == 'b')) {
+                if ((s->right == nullptr || s->right->color == Node::BLACK)) {
                     if (s->left != nullptr) {
-                        s->left->color = 'b';
+                        s->left->color = Node::BLACK;
                     }
-                    s->color = 'r';
+                    s->color = Node::RED;
                     this->right_rotate(s);
                     s = node->parent->right;
                 }
                 // Sibling is black, his right child is red
                 s->color = node->parent->color;
-                node->parent->color = 'b';
+                node->parent->color = Node::BLACK;
                 if (s->right != nullptr) {
-                    s->right->color = 'b';
+                    s->right->color = Node::BLACK;
                 }
                 this->left_rotate(node->parent);
                 node = this->root;
             }
         } else { // Symmetrical case
             Node *s = node->parent->left;
-            if (s != nullptr && s->color == 'r') { // Sibling is red
-                s->color = 'b';
-                node->parent->color = 'r';
+            if (s != nullptr && s->color == Node::RED) { // Sibling is red
+                s->color = Node::BLACK;
+                node->parent->color = Node::RED;
                 this->right_rotate(node->parent);
                 s = node->parent->left;
             }
-            if ((s->left == nullptr || s->left->color == 'b') &&
+            if ((s->left == nullptr || s->left->color == Node::BLACK) &&
                 (s->right == nullptr ||
-                 s->right->color == 'b')) { // Sibling and his children is black
-                s->color = 'r';
+                 s->right->color == Node::BLACK)) { // Sibling and his children is black
+                s->color = Node::RED;
                 node = node->parent;
             } else { // Sibling is black, his right child is red, left is black
-                if ((s->left == nullptr || s->left->color == 'b')) {
+                if ((s->left == nullptr || s->left->color == Node::BLACK)) {
                     if (s->right != nullptr) {
-                        s->right->color = 'b';
+                        s->right->color = Node::BLACK;
                     }
-                    s->color = 'r';
+                    s->color = Node::RED;
                     this->left_rotate(s);
                     s = node->parent->left;
                 }
                 // Sibling is black, his left child is red
                 s->color = node->parent->color;
-                node->parent->color = 'b';
+                node->parent->color = Node::BLACK;
                 if (s->left != nullptr) {
-                    s->left->color = 'b';
+                    s->left->color = Node::BLACK;
                 }
                 this->right_rotate(node->parent);
                 node = this->root;
             }
         }
     }
-    node->color = 'b';
+    node->color = Node::BLACK;
 }
 
 // Returns a pointer to a node in the subtree `node` with the value `value`
@@ -364,7 +364,7 @@ ostream &operator<<(ostream &out, const RBTree::Node *node) {
         }
     } else if (node == RBTree::NIL) {
         out << setw(width) << 'n';
-    } else if (node->color == 'r') {
+    } else if (node->color == RBTree::Node::RED) {
         out << "\033[31m" << setw(width) << node->inf << "\033[0m";
     } else {
         out << setw(width) << node->inf;
