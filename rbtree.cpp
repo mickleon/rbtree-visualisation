@@ -358,8 +358,8 @@ int digit_count(const int x) {
 }
 
 ostream &operator<<(ostream &out, const Node *node) {
-    const std::streamsize width = cout.width();
-    out << setw(0);
+    const std::streamsize width = out.width();
+    out.width(0);
     if (node == nullptr) {
         if (width > 0) {
             out << setw(width) << ' ';
