@@ -1,5 +1,7 @@
 # Red/black tree visualisation
 
+See also [red/black tree set](https://github.com/mickleon/rbtree-set-visualization), that support many types.
+
 ## What is this?
 
 There is C++ class for red/black tree, that have method for **console output** for tree **without any specific libraries**. The program correctly outputs numbers **with any number of digits**.
